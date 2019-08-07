@@ -179,11 +179,13 @@ def imagesearch_region_loop(image, timesample, x1, y1, x2, y2, precision=0.8):
         pos = imagesearcharea(image, x1, y1, x2, y2, precision)
     return pos
 
-""" busca imágenes dadas en una lista continuamente hasta encontrarse
-    lista : lista de imagenes
-    time : Waiting time after failing to find the image
-    precision : the higher, the lesser tolerant and fewer false positives are found default is 0.8
-    retorna una lista con el nombre de la imagen y las coordenadas de su extremo superior izquierdo
+""" 
+busca imágenes dadas en una lista continuamente hasta encontrarse
+lista : lista de imagenes
+time : Waiting time after failing to find the image
+precision : the higher, the lesser tolerant and fewer false positives are found default is 0.8
+retorna una lista con el nombre de la imagen y las coordenadas de su extremo superior izquierdo
+
 """
 
 
