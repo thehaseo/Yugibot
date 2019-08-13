@@ -1,9 +1,9 @@
 import tkinter as tk
+from tkinter import scrolledtext
+from tkinter import ttk
 import threading
 from imagesearch import *
 from programa import DetectarPantalla
-
-
 
 
 class Gui(tk.Frame):
@@ -19,10 +19,12 @@ class Gui(tk.Frame):
             state="normal", command=self.start_program
             )  # Botón de start del programa
         self.start_button.pack(side="bottom")
-        self.npc_search_button = tk.Checkbutton(text="npc search")  # npc search checkbutton
+        self.variable_npc_button = tk.IntVar()
+        self.npc_search_button = ttk.Checkbutton(text="npc search")  # npc search checkbutton
+        self.npc_search_button.state(['!alternate'])
         self.npc_search_button.pack(side="left")
         # text screen and scrollbar ins
-        self.text_window = tk.Text(width=30, height=20, state='disabled', wrap='word')
+        self.text_window = tk.scrolledtext.ScrolledText(width=30, height=20, state='disabled', wrap='word')
         self.text_window.pack(side='right')
         self.program = None
         
@@ -30,18 +32,18 @@ class Gui(tk.Frame):
     def start_program(self):
         if self.program is None:
             self.text_window.config(state='normal')
+            self.text_window.delete('1.0', 'end')
             self.text_window.insert('1.0', "Detectando pantalla...\n")
             self.text_window.config(state='disabled')
-            self.program = DetectarPantalla()
+            self.program = DetectarPantalla(self.npc_search_button)
             self.program.start()
             self.start_button["text"] = "Stop"
-            if self.program.isAlive():
-                print("hola")
         else:
             self.program.stop()
             self.start_button["text"] = "Start"
             self.program = None
 
+            
     def insert_text(self, text):
         self.text_window.insert(text)
 
