@@ -38,8 +38,8 @@ class DetectarPantalla(threading.Thread):
                     "images/avanzar_escena.jpg", "images/pvp_arena.jpg",
                     "images/shop.jpg", "images/character_text.jpg", "images/level_up.jpg"
                     ]
-                self.npcdm_list = ["npc/andrew1.jpg", "npc/andrew2.jpg",  "npc/bella1.jpg", 
-                    "npc/bella2.jpg", "npc/bella3.jpg", "npc/christine1.jpg", 
+                self.npcdm_list = ["npc/andrew1.jpg", "npc/andrew2.jpg", "npc/andrew3.jpg",
+                    "npc/bella1.jpg", "npc/bella2.jpg", "npc/bella3.jpg", "npc/christine1.jpg", 
                     "npc/christine2.jpg", "npc/christine3.jpg", "npc/daniel1.jpg",
                     "npc/david1.jpg", "npc/emma1.jpg", "npc/espa_roba1.jpg", 
                     "npc/espa_roba2.jpg", "npc/hailey1.jpg", "npc/hailey2.jpg", 
@@ -73,7 +73,7 @@ class DetectarPantalla(threading.Thread):
                                         # que no sean algunas de las 4 pantallas principales
                                         # clickea sobre ellas
                                         print(self.pos[0])
-                                        while index == 12:
+                                        while index == 11:
                                                 if self.detener.is_set():
                                                         return 
                                                 if imagesearch(imagen) == [-1,-1]:
@@ -159,64 +159,53 @@ class DetectarPantalla(threading.Thread):
         def npc_search(self,lista):
         # Busca los npc en la pantalla dados en la lista y al encontrar uno presiona el botón
         # autoduel luego espera a que el duelo termine para regresar a la pantalla y seguir 
-        # buscando npc.l
+        # buscando npc
                 Image_list = lista
                 count = 0 
                 for imagen in Image_list:
                         if self.detener.is_set(): # Si se presiona el botón stop la busqueda se detiene
                                 return
-                        pos = imagesearch(imagen)
+                        pos = imagesearch(imagen,precision=0.9)
                         if pos[0] == -1:
                                 print(imagen+" not found, waiting")
                                 count += 1
-                                sleep(0.1)
                         elif pos[0] != -1:
                                 print("npc encontrado")
+                                print(pos)
                                 click_image(imagen, pos, "left", 0.2)
-                                sleep(2)
+                                sleep(3)
                                 while imagesearch("images/auto_duel_button.jpg") == [-1,-1]: # clickea hasta encontrar el botón auto-duel
                                         if self.detener.is_set():
                                                 return  
                                         sleep(1)
-                                        if imagesearch("images/character_text.jpg"):
+                                        if imagesearch("images/character_text.jpg") != [-1,-1]:
                                                 click_image("images/character_text.jpg", imagesearch("images/character_text.jpg"), "left", 0.2)
                                                 sleep(1)
                                         else:
                                                 return
-                                click_image("images/auto_duel_button.jpg", imagesearch("images/auto_duel_button.jpg"), "left", 0.2) # clickea el botón autoduel
-                                # Se busca de forma constante el botón ok que aparece luego de terminar el duelo
-                                # y lo clickea al aparecer junto a los botones next hasta quedar de nuevo en la 
-                                # pantalla principal
-                                ok_button = imagesearch("images/pop_up_ok.jpg")
-                                while ok_button == [-1,-1]:    
+                                if imagesearch("images/auto_duel_button.jpg")[0] != -1:
+                                        click_image("images/auto_duel_button.jpg", imagesearch("images/auto_duel_button.jpg"), "left", 0.2) # clickea el botón autoduel
+                                # Se busca de forma constante los botones ok y next para regresar a la pantalla
+                                # principal una vez finalizado el duelo
+                                while True:
+                                        ok_button = imagesearch("images/pop_up_ok.jpg") 
+                                        next_button = imagesearch("images/Button_next.jpg") 
                                         if self.detener.is_set(): # Si se presiona el botón stop la busqueda se detiene
                                                 return
-                                        ok_button = imagesearch("images/pop_up_ok.jpg")
-                                click_image("images/pop_up_ok.jpg", ok_button, "left", 0.2)
-                                # Se ejecuta el mismo código 2 veces para presionar next en
-                                # las pantallas de experiencia y de puntaje
-                                next_button = imagesearch("images/Button_next.jpg",3)
-                                while next_button == [-1,-1]:    
-                                        if self.detener.is_set(): # Si se presiona el botón stop la busqueda se detiene
+                                        if ok_button[0] != -1:
+                                                click_image("images/pop_up_ok.jpg", ok_button, "left", 0.2)
+                                        elif next_button[0] != -1:
+                                                click_image("images/pop_up_ok.jpg", next_button, "left", 0.2)
+                                        elif imagesearch("images/character_text.jpg")[0] != -1:
                                                 return
-                                        if imagesearch("images/level_up.jpg") != [-1,-1]:
-                                                click_image("images/level_up.jpg", imagesearch("images/level_up.jpg"), "left", 0.2)
-                                        next_button = imagesearch("images/Button_next.jpg")
-                                click_image("images/pop_up_ok.jpg", next_button, "left", 0.2)
-                                next_button = imagesearch("images/Button_next.jpg",3)
-                                while next_button == [-1,-1]:    
-                                        if self.detener.is_set(): # Si se presiona el botón stop la busqueda se detiene
-                                                return
-                                        next_button = imagesearch("images/Button_next.jpg")
-                                click_image("images/pop_up_ok.jpg", next_button, "left", 0.2)
-                                # Detecta el dialogo del personaje al finalizar el duelo y clickea hasta
-                                # volver a la pantalla principal
+                                # Se detecta la pantalla de diálogo después del duelo y clickea hasta que el personaje
+                                # deja de hablar
                                 dialogo = imagesearch("images/character_text.jpg")
                                 while dialogo == [-1,-1]:
                                         if self.detener.is_set(): # Si se presiona el botón stop la busqueda se detiene
                                                 return
                                         dialogo = imagesearch("images/character_text.jpg")
-                                while imagesearch("images/character_text.jpg") != [-1,-1]:
+                                while dialogo != [-1,-1]:
                                         if self.detener.is_set(): # Si se presiona el botón stop la busqueda se detiene
                                                 return
                                         click_image("images/character_text.jpg", dialogo, "left", 0.2)
