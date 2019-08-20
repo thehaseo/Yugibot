@@ -31,22 +31,28 @@ class DetectarPantalla(threading.Thread):
                 self.gx_world = False
                 self._5ds_world = False
                 self.npc_search_checkbox = Checkbutton
-                self.image_list = ["images/Button_next.jpg", "images/Gate.jpg", 
-                    "images/go_back_button.jpg", "images/initiateLink.jpg", 
-                    "images/pop_up_ok.jpg", "images/Suspended_duel.jpg",
-                    "images/close_button.jpg", "images/duel_studio.jpg",
+                self.image_list = ["images/Button_next.jpg", "images/go_back_button.jpg",
+                    "images/pop_up_ok.jpg", "images/close_button.jpg", 
+                    "images/Gate.jpg", "images/initiateLink.jpg", 
+                    "images/Suspended_duel.jpg", "images/duel_studio.jpg",
                     "images/avanzar_escena.jpg", "images/pvp_arena.jpg",
-                    "images/shop.jpg", "images/character_text.jpg", "images/level_up.jpg"
+                    "images/shop.jpg", "images/character_text.jpg", 
+                    "images/level_up.jpg"
                     ]
                 self.npcdm_list = ["npc/andrew1.jpg", "npc/andrew2.jpg", "npc/andrew3.jpg",
-                    "npc/bella1.jpg", "npc/bella2.jpg", "npc/bella3.jpg", "npc/christine1.jpg", 
-                    "npc/christine2.jpg", "npc/christine3.jpg", "npc/daniel1.jpg",
-                    "npc/david1.jpg", "npc/emma1.jpg", "npc/espa_roba1.jpg", 
-                    "npc/espa_roba2.jpg", "npc/hailey1.jpg", "npc/hailey2.jpg", 
-                    "npc/jess1.jpg", "npc/jess2.jpg", "npc/joey1.jpg", 
-                    "npc/josh1.jpg", "npc/mickey1.jpg", "npc/meg1.jpg"
+                    "npc/ashley1.jpg", "npc/ashley2.jpg", "npc/bella1.jpg", "npc/bella2.jpg", 
+                    "npc/bella3.jpg", "npc/bella4.jpg", "npc/bella5.jpg", "npc/christine1.jpg", 
+                    "npc/christine2.jpg", "npc/christine3.jpg", "npc/daniel1.jpg", 
+                    "npc/daniel2.jpg", "npc/david1.jpg", "npc/emma1.jpg", 
+                    "npc/emma2.jpg", "npc/emma3.jpg", "npc/espa_roba1.jpg", "npc/espa_roba2.jpg", 
+                    "npc/hailey1.jpg", "npc/hailey2.jpg", "npc/jess1.jpg", "npc/jess2.jpg", 
+                    "npc/jess3.jpg", "npc/joey1.jpg", "npc/josh1.jpg", "npc/josh2.jpg", 
+                    "npc/josh3.jpg", "npc/mickey1.jpg", 
+                    "npc/meg1.jpg", "npc/meg2.jpg", "npc/mokuba1.jpg",
+                    "npc/weevil_own.jpg"
                     ]
-                self.npcgx_list = ["npc/alyssa1.jpg", "npc/bella1.jpg", "npc/bella2.jpg", 
+                self.npcgx_list = ["npc/alyssa1.jpg", "npc/bastion1.jpg"
+                    "npc/bella1.jpg", "npc/bella2.jpg", 
                     "npc/bella3.jpg", "npc/emma1.jpg", "npc/jaden_own.jpg", 
                     "npc/kylie1.jpg", "npc/logan1.jpg", "npc/madison1.jpg",
                     ]
@@ -65,13 +71,12 @@ class DetectarPantalla(threading.Thread):
                                 if self.detener.is_set():
                                         return 
 
-                                self.pos = imagesearch(imagen)
+                                self.pos = imagesearch(imagen, precision=0.9)
                                 if self.pos[0] == -1:
                                         print(imagen+" not found, waiting")
                                         sleep(0.1)
-                                else:   # Al encontrar una imagen de la lista de 
-                                        # que no sean algunas de las 4 pantallas principales
-                                        # clickea sobre ellas
+                                else:   #Si encuentra un personaje hablando clickea hasta que 
+                                        # se calle
                                         print(self.pos[0])
                                         while index == 11:
                                                 if self.detener.is_set():
@@ -81,9 +86,12 @@ class DetectarPantalla(threading.Thread):
                                                 else:
                                                         click_image(imagen, imagesearch(imagen), "left", 0.2)
                                                         sleep(1)
-                                        if index in {0,2,3,4,5,6,8,11,12}:
+                                        # Al encontrar una imagen de la lista de 
+                                        # que no sean algunas de las 4 pantallas principales
+                                        # clickea sobre ellas
+                                        if index in {0,1,2,3,5,6,8,12}:
                                                 click_image(imagen, self.pos, "left", 0.2)
-                                        elif index == 1:
+                                        elif index == 4:
                                                 print("Gate detected")
                                                 self.gate = True
                                                 self.shop = False
@@ -119,7 +127,8 @@ class DetectarPantalla(threading.Thread):
                 coord = None
                 world_check_button = list(map(imagesearch, ("images/check_world_button.jpg", 
                                 "images/check_world_button2.jpg", "images/check_world_button3.jpg",
-                                "images/check_world_button4.jpg", "images/check_world_button5.jpg")))
+                                "images/check_world_button4.jpg", "images/check_world_button5.jpg",
+                                "images/check_world_button6.jpg", "images/check_world_button7.jpg")))
                 for cordx, cordy in world_check_button:
                         if not -1 in {cordx,cordy}:
                                 x = cordx
@@ -162,6 +171,10 @@ class DetectarPantalla(threading.Thread):
         # buscando npc
                 Image_list = lista
                 count = 0 
+                npc_gate = False
+                npc_pvp = False
+                npc_shop = False
+                npc_studio = False
                 for imagen in Image_list:
                         if self.detener.is_set(): # Si se presiona el botón stop la busqueda se detiene
                                 return
@@ -182,35 +195,40 @@ class DetectarPantalla(threading.Thread):
                                                 click_image("images/character_text.jpg", imagesearch("images/character_text.jpg"), "left", 0.2)
                                                 sleep(1)
                                         else:
-                                                return
+                                                break
                                 if imagesearch("images/auto_duel_button.jpg")[0] != -1:
                                         click_image("images/auto_duel_button.jpg", imagesearch("images/auto_duel_button.jpg"), "left", 0.2) # clickea el botón autoduel
+                                sleep(3)
                                 # Se busca de forma constante los botones ok y next para regresar a la pantalla
                                 # principal una vez finalizado el duelo
                                 while True:
+                                        sleep(2)
                                         ok_button = imagesearch("images/pop_up_ok.jpg") 
-                                        next_button = imagesearch("images/Button_next.jpg") 
+                                        next_button = imagesearch("images/Button_next.jpg")
+                                        level_up_screen = imagesearch("images/level_up.jpg")
+                                        dialogo = imagesearch("images/character_text.jpg")
                                         if self.detener.is_set(): # Si se presiona el botón stop la busqueda se detiene
                                                 return
                                         if ok_button[0] != -1:
                                                 click_image("images/pop_up_ok.jpg", ok_button, "left", 0.2)
                                         elif next_button[0] != -1:
                                                 click_image("images/pop_up_ok.jpg", next_button, "left", 0.2)
-                                        elif imagesearch("images/character_text.jpg")[0] != -1:
-                                                return
-                                # Se detecta la pantalla de diálogo después del duelo y clickea hasta que el personaje
-                                # deja de hablar
-                                dialogo = imagesearch("images/character_text.jpg")
-                                while dialogo == [-1,-1]:
-                                        if self.detener.is_set(): # Si se presiona el botón stop la busqueda se detiene
-                                                return
-                                        dialogo = imagesearch("images/character_text.jpg")
-                                while dialogo != [-1,-1]:
-                                        if self.detener.is_set(): # Si se presiona el botón stop la busqueda se detiene
-                                                return
-                                        click_image("images/character_text.jpg", dialogo, "left", 0.2)
-                                        sleep(1)
+                                        elif level_up_screen[0] != -1:
+                                                click_image("images/level_up.jpg", level_up_screen, "left", 0.2)
+                                        # Se detecta la pantalla de diálogo después del duelo y clickea hasta que el personaje
+                                        # deja de hablar
+                                        elif dialogo[0] != -1:
+                                                while dialogo != [-1,-1]:
+                                                        if self.detener.is_set(): # Si se presiona el botón stop la busqueda se detiene
+                                                                return
+                                                        click_image("images/character_text.jpg", dialogo, "left", 0.2)
+                                                        sleep(1)
+                                                        dialogo = imagesearch("images/character_text.jpg")
+                                        elif imagesearch("images/Gate.jpg")[0] != -1:
+                                                break
 
+
+        def change_screen(self):
 
 
 
