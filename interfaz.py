@@ -19,13 +19,20 @@ class Gui(tk.Frame):
             state="normal", command=self.start_program
             )  # Botón de start del programa
         self.start_button.pack(side="bottom")
-        self.variable_npc_button = tk.IntVar()
-        self.npc_search_button = ttk.Checkbutton(text="npc search")  # npc search checkbutton
+        self.npc_search_button = ttk.Checkbutton(text="npc search", takefocus=0)  # npc search checkbutton
         self.npc_search_button.state(['!alternate'])
         self.npc_search_button.pack(side="left")
         # text screen and scrollbar ins
         self.text_window = tk.scrolledtext.ScrolledText(width=30, height=20, state='disabled', wrap='word')
         self.text_window.pack(side='right')
+        # boton para automatizar tag duel
+        self.tag_duel_button = ttk.Checkbutton(text="auto tag duel", takefocus=0) 
+        self.tag_duel_button.state(['!alternate'])
+        self.tag_duel_button.pack(side="left")
+        # boton para farmear puerta
+        self.farm_gate_button = ttk.Checkbutton(text="Farm gate", takefocus=0) 
+        self.farm_gate_button.state(['!alternate'])
+        self.farm_gate_button.pack(side="left")
         self.program = None
         
 
@@ -35,7 +42,7 @@ class Gui(tk.Frame):
             self.text_window.delete('1.0', 'end')
             self.text_window.insert('1.0', "Detectando pantalla...\n")
             self.text_window.config(state='disabled')
-            self.program = DetectarPantalla(self.npc_search_button)
+            self.program = DetectarPantalla(self.npc_search_button, self.tag_duel_button, self.farm_gate_button)
             self.program.start()
             self.start_button["text"] = "Stop"
         else:
