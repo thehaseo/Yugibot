@@ -111,7 +111,34 @@ def imagesearch(image, precision=0.8, save=None):
     return max_loc
 
 
+'''
+Searchs for an image on the screen in color
 
+input :
+
+image : path to the image file (see opencv imread for supported types)
+precision : the higher, the lesser tolerant and fewer false positives are found default is 0.8
+im : a PIL image, usefull if you intend to search the same unchanging region for several elements
+
+returns :
+the top left corner coordinates of the element if found as an array [x,y] or [-1,-1] if not
+
+'''
+
+def imagesearch_color(image, precision=0.8, save=None):
+    im = pyautogui.screenshot()
+    
+    img_rgb = np.array(im)
+    template = cv2.imread(image, 1)
+    template.shape[::-1]
+
+    if save:
+        im.save('testarea.png') #usefull for debugging purposes, this will save the captured region as "testarea.png"
+    res = cv2.matchTemplate(img_rgb, template, cv2.TM_CCOEFF_NORMED)
+    min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
+    if max_val < precision:
+        return [-1,-1]
+    return max_loc
 '''
 Searchs for an image on screen continuously until it's found.
 

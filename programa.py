@@ -17,7 +17,7 @@ class DetectarPantalla(threading.Thread):
         continuamente hasta encontrarse y clickea la imagen en la pantalla.
 
         '''
-        def __init__(self, Checkbutton, tagbutton, farm_gate_button):
+        def __init__(self, Checkbutton, tagbutton, cuadro_de_texto, farm_gate_button):
                 super().__init__()
                 self.detener = threading.Event()
                 self.daemon = True
@@ -192,6 +192,7 @@ class DetectarPantalla(threading.Thread):
                         print("5ds world not unlocked")
 
 
+
         def change_screen(self, to_gate=False):
                 if to_gate:
                         gate_coord = imagesearch("images/Gate_off.jpg")
@@ -231,9 +232,6 @@ class DetectarPantalla(threading.Thread):
                                 self.pvp_arena = False
                                 self.duel_studio = False
                                 self.npc_searched = True
-
-
-
 
 
 
@@ -307,9 +305,8 @@ class DetectarPantalla(threading.Thread):
                                                                 tag_button = imagesearch("images/tag_duel_button.jpg")
                                                                 if tag_button[0] != -1:
                                                                         break
-                                                        break
+                                                        break                     
 
-                                
 
 
         def npc_search(self,lista):
@@ -406,6 +403,7 @@ class DetectarPantalla(threading.Thread):
                 return [-1,-1]
 
 
+
         def farm_gate(self):
                 while True:
                         if not self.gate:
@@ -460,9 +458,6 @@ class DetectarPantalla(threading.Thread):
                                                                 dialogo = imagesearch("images/character_text.jpg")
                                                 elif imagesearch("images/Gate.jpg")[0] != -1:
                                                         break
-
-
-
 
 
 
