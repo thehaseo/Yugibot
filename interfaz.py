@@ -13,9 +13,11 @@ class Gui(ttk.Notebook):
         super().__init__(parent, *args, **kwargs)
         self.pestana1 = PestanaPrincipal(self)
         self.pestana2 = PestanaDuelistas(self)
-        self.add(self.pestana1, text='primera pestaña', sticky='nsew')
+        self.add(self.pestana1, text='bot', sticky='nsew')
         self.add(self.pestana2, text='duelistas', sticky='nsew')
         self.pestana1.start_button['command'] = self.start_program
+        #lista de duelistas de la puerta para pasarselo al programa principal
+        
         self.program = None
         
 
@@ -24,9 +26,10 @@ class Gui(ttk.Notebook):
             self.pestana1.text_window.config(state='normal')
             self.pestana1.text_window.delete('1.0', 'end')
             self.pestana1.text_window.insert('1.0', "Detectando pantalla...\n")
+            # self.pestana1.text_window.tag_add('right', '1.0', 'end')
             self.pestana1.text_window.config(state='disabled')
             self.program = DetectarPantalla(self.pestana1.npc_search_button, self.pestana1.farm_gate_button, 
-                                            self.pestana1.text_window, self.pestana1.tag_duel_button)
+                                            self.pestana1.text_window, self.pestana1.tag_duel_button, self.pestana2.lista_de_duelistas)
             self.program.start()
             self.pestana1.start_button["text"] = "Stop"
         else:
@@ -58,7 +61,7 @@ class PestanaPrincipal(tk.Frame):
         self.tag_duel_button.state(['!alternate'])
         self.text_window = tk.scrolledtext.ScrolledText(self, width=30, height=20, 
                                                         state='disabled', wrap='word')
-        
+        # self.text_window.tag_configure('right', justify='right')
 
         self.checkbuttons_frame.grid(row=0, column=0, sticky='nw')
         self.npc_search_button.grid(row=0, column=0, sticky='w')
@@ -104,10 +107,14 @@ class PestanaDuelistas(tk.Frame):
             niveldl = ttk.Combobox(mitad, takefocus=0, state='readonly',
                                    justify='right', width=8)
             niveldl['values'] = ('lvl 10', 'lvl 20', 'lvl 30', 'lvl 40')
-            duelista.grid(row=rw, column=clmn, padx=2, pady=3, sticky='w')
-            niveldl.grid(row=rw, column=clmn+1, padx=5, pady=3)
+            texto_cantidad = StringVar()
+            cantidad = tk.Entry(mitad, takefocus=0, textvariable=texto_cantidad, width=5)
             
-            return (duelista, niveldl)
+            duelista.grid(row=rw, column=clmn, padx=2, pady=3, sticky='w')
+            cantidad.grid(row=rw, column=clmn+1, padx=3, pady=3)
+            niveldl.grid(row=rw, column=clmn+2, padx=5, pady=3)
+            
+            return (duelista, cantidad, niveldl)
             
         
         # Aqui comienza la creación de los checkbuttons de los duelistas 
@@ -149,6 +156,19 @@ class PestanaDuelistas(tk.Frame):
         self.leo = crear_duelista(self, 'Leo', 13, 0, self.mitad2)
         self.luna = crear_duelista(self, 'Luna', 14, 0, self.mitad2)
         self.trudge = crear_duelista(self, 'Tetsu Trudge', 15, 0, self.mitad2)
+        
+        # creación de lista con todos los duelistas de gate para pasarle sus argumentos
+        # al programa principal
+        self.lista_de_duelistas = [self.yami_yugi, self.seto_kaiba, self.joey, self.mai,
+                                   self.mai, self.tea, self.weevil, self.rex, self.mako,
+                                   self.keith, self.odion, self.ishizu, self.pegasus, 
+                                   self.bakura, self.marik, self.yugi, self.paradox,
+                                   self.mokuba, self.arkana, self.bonz, self.roba, 
+                                   self.tristan, self.jaden, self.chazz, self.alexis, 
+                                   self.aster, self.bastion, self.crowler, self.jesse,
+                                   self.syrus, self.zane, self.tyranno, self.yusei, 
+                                   self.jack, self.crow, self.akiza, self.leo, self.luna,
+                                   self.trudge]
             
 
 

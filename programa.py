@@ -17,7 +17,7 @@ class DetectarPantalla(threading.Thread):
         continuamente hasta encontrarse y clickea la imagen en la pantalla.
 
         '''
-        def __init__(self, Checkbutton, tagbutton, cuadro_de_texto, farm_gate_button):
+        def __init__(self, npc_checkbutton, farm_gate_button, cuadro_de_texto, tagbutton, duelistas):
                 super().__init__()
                 self.detener = threading.Event()
                 self.daemon = True
@@ -31,9 +31,12 @@ class DetectarPantalla(threading.Thread):
                 self.gx_world = False
                 self._5ds_world = False
                 self.npc_searched = False
-                self.npc_search_checkbox = Checkbutton
+                self.npc_search_checkbox = npc_checkbutton
                 self.farm_button = farm_gate_button
                 self.tag_check = tagbutton
+                self.texto = cuadro_de_texto
+                self.lista_duelistas = duelistas
+                self.contador_de_lineas = 2.0
                 self.image_list = ["images/Button_next.jpg", "images/go_back_button.jpg",
                     "images/pop_up_ok.jpg", "images/close_button.jpg", 
                     "images/Gate_on.jpg", "images/initiateLink.jpg", 
@@ -68,7 +71,7 @@ class DetectarPantalla(threading.Thread):
                     "npc/liam1.jpg", "npc/yusei_own1.jpg", 
                     "npc/wild_dan1.jpg",
                     ]
-                self.tag_check = tagbutton
+        
         
         def run(self):
                 # ejecuta un loop infinito buscando las imágenes de la pantalla
@@ -76,10 +79,10 @@ class DetectarPantalla(threading.Thread):
                         for index, imagen in enumerate(self.image_list):
                                 if self.detener.is_set():
                                         return 
-                                if self.tag_check.state() == ('selected',):
-                                        tag_duel = threading.Thread(target=self.tag_duel, daemon=True)
-                                        tag_duel.start()
-                                        tag_duel.join()
+                                # if self.tag_check.state() == ('selected',):
+                                #         tag_duel = threading.Thread(target=self.tag_duel, daemon=True)
+                                #         tag_duel.start()
+                                #         tag_duel.join()
                                 self.pos = imagesearch(imagen, precision=0.9)
                                 if self.pos[0] == -1:
                                         print(imagen+" not found, waiting")
@@ -103,7 +106,7 @@ class DetectarPantalla(threading.Thread):
                                         elif index in {7,9,10}:
                                                 self.change_screen(to_gate=True)
                                         elif index == 4:
-                                                print("Gate detected")
+                                                self.imprimir_texto("Gate detected")
                                                 self.gate = True
                                                 self.shop = False
                                                 self.pvp_arena =  False
@@ -119,7 +122,7 @@ class DetectarPantalla(threading.Thread):
                                                 # principal de la pantalla espere a que la busqueda de npc
                                                 # termine
                                                 if self.npc_search_checkbox.state() == ('selected',):
-                                                        print("Buscando npc")
+                                                        self.imprimir_texto("Buscando npc...")
                                                         if self.dm_world:
                                                                 search_npc = threading.Thread(target=self.npc_search(self.npcdm_list), daemon=True)
                                                                 search_npc.start()
@@ -132,11 +135,10 @@ class DetectarPantalla(threading.Thread):
                                                                 search_npc = threading.Thread(target=self.npc_search(self.npc5ds_list), daemon=True)
                                                                 search_npc.start()
                                                                 search_npc.join()
-                                                elif self.farm_button.state() == ('selected',):
-                                                                farm = threading.Thread(target=self.farm_gate)
+                                                if self.farm_button.state() == ('selected',):
+                                                                farm = threading.Thread(target=self.farm_gate, daemon=True)
                                                                 farm.start()
                                                                 farm.join()
-
 
 
         def check_world(self):
@@ -144,63 +146,81 @@ class DetectarPantalla(threading.Thread):
                 # (cambiando la variable a True) dependiendo de cuales mundos aparezcan 
                 # en las imágenes una vez presionado el botón
                 coord = None
+                contador = 0
                 world_check_button = list(map(imagesearch, ("images/check_world_button.jpg", 
                                 "images/check_world_button2.jpg", "images/check_world_button3.jpg",
                                 "images/check_world_button4.jpg", "images/check_world_button5.jpg",
                                 "images/check_world_button6.jpg", "images/check_world_button7.jpg")))
-                for cordx, cordy in world_check_button:
+                
+                for cordx, cordy in world_check_button:  
                         if not -1 in {cordx,cordy}:
                                 x = cordx
                                 y = cordy
                                 coord = [x,y]
-                        if -1 in {cordx,cordy}:
-                                print("no se encontró el botón para verificar el mundo")
-                                print("se dará por hecho que se está en dm y por los npc buscados serán de este mundo")
+                                break
+                        if contador == len(world_check_button) - 1:
+                                self.imprimir_texto("no se encontró el botón para verificar el mundo")
+                                self.imprimir_texto("se dará por hecho que se está en dm y por los npc buscados serán de este mundo")
                                 self.gx_world = False
                                 self._5ds_world = False
                                 self.dm_world = True
                                 self.world_checked = True
                                 return
+                        contador += 1
                 click_image("images/check_world_button.jpg", coord, "left", 0.1)
-                if imagesearch("images/gx_world_check.jpg") != -1 and imagesearch("images/5ds_world_check.jpg") != -1:    
+                if imagesearch("images/gx_world_check.jpg")[0] != -1 and imagesearch("images/5ds_world_check.jpg")[0] != -1:    
                         self.gx_world = False
                         self._5ds_world = False
                         self.dm_world = True
                         self.world_checked = True
-                        print("Gx world unlocked")
-                        print("5ds world unlocked")
-                elif imagesearch("images/dm_world_check.jpg") != -1 and imagesearch("images/5ds_world_check.jpg") != -1:
+                        self.imprimir_texto("Gx world unlocked")
+                        self.imprimir_texto("5ds world unlocked")
+                        self.imprimir_texto("Se encuentra en dm world")
+                elif imagesearch("images/dm_world_check.jpg")[0] != -1 and imagesearch("images/5ds_world_check.jpg")[0] != -1:
                         self.gx_world = True
                         self._5ds_world = False
                         self.dm_world = False
                         self.world_checked = True
-                        print("Gx world unlocked")
-                        print("5ds world unlocked")
-                elif imagesearch("images/dm_world_check.jpg") != -1 and imagesearch("images/gx_world_check.jpg") != -1:
+                        self.imprimir_texto("Gx world unlocked")
+                        self.imprimir_texto("5ds world unlocked")
+                        self.imprimir_texto("Se encuentra en gx world")
+                elif imagesearch("images/dm_world_check.jpg")[0] != -1 and imagesearch("images/gx_world_check.jpg")[0] != -1:
                         self.gx_world = False
                         self._5ds_world = True
                         self.dm_world = False
                         self.world_checked = True
-                        print("Gx world unlocked")
-                        print("5ds world unlocked")
-                elif imagesearch("images/gm_world_check.jpg") != -1 and imagesearch("images/5ds_world_check.jpg") == -1:
+                        self.imprimir_texto("Gx world unlocked")
+                        self.imprimir_texto("5ds world unlocked")
+                        self.imprimir_texto("Se encuentra en 5ds world")
+                elif imagesearch("images/dm_world_check.jpg")[0] != -1 and imagesearch("images/5ds_world_check.jpg")[0] == -1:
                         self.gx_world = False
                         self._5ds_world = False
                         self.dm_world = True
                         self.world_checked = True
-                        print("Gx world unlocked")
-                        print("5ds world not unlocked")
-
+                        self.imprimir_texto("Gx world unlocked")
+                        self.imprimir_texto("5ds world not unlocked")
+                        self.imprimir_texto("Se encuentra en dm world")
+                elif imagesearch("images/dm_world_check.jpg")[0] != -1 and imagesearch("images/5ds_world_check.jpg")[0] == -1:
+                        self.gx_world = False
+                        self._5ds_world = False
+                        self.dm_world = True
+                        self.world_checked = True
+                        self.imprimir_texto("Gx world unlocked")
+                        self.imprimir_texto("5ds world not unlocked")
+                        self.imprimir_texto("Se encuentra en gx world")
 
 
         def change_screen(self, to_gate=False):
                 if to_gate:
                         gate_coord = imagesearch("images/Gate_off.jpg")
-                        click_image("images/Gate_off.jpg", gate_coord, "left", 0.2)
-                        self.gate = True
-                        self.shop = False
-                        self.pvp_arena = False
-                        self.duel_studio = False
+                        if gate_coord[0] != -1:
+                                click_image("images/Gate_off.jpg", gate_coord, "left", 0.2)
+                                self.gate = True
+                                self.shop = False
+                                self.pvp_arena = False
+                                self.duel_studio = False
+                        else:
+                                return
                 else:
                         if self.gate:
                                 pvp_coord = imagesearch("images/pvp_arena_off.jpg")
@@ -232,7 +252,6 @@ class DetectarPantalla(threading.Thread):
                                 self.pvp_arena = False
                                 self.duel_studio = False
                                 self.npc_searched = True
-
 
 
         def tag_duel(self):
@@ -308,7 +327,6 @@ class DetectarPantalla(threading.Thread):
                                                         break                     
 
 
-
         def npc_search(self,lista):
                 npc_gate = False
                 npc_pvp = False
@@ -346,32 +364,7 @@ class DetectarPantalla(threading.Thread):
                                         sleep(3)
                                         # Se busca de forma constante los botones ok y next para regresar a la pantalla
                                         # principal una vez finalizado el duelo
-                                        while True:
-                                                sleep(2)
-                                                ok_button = imagesearch("images/pop_up_ok.jpg") 
-                                                next_button = self.coord_for_multiple(("images/Button_next_duel.jpg",
-                                                        "images/Button_next.jpg"))
-                                                level_up_screen = imagesearch("images/level_up.jpg")
-                                                dialogo = imagesearch("images/character_text.jpg")
-                                                if self.detener.is_set(): # Si se presiona el botón stop la busqueda se detiene
-                                                        return
-                                                if ok_button[0] != -1:
-                                                        click_image("images/pop_up_ok.jpg", ok_button, "left", 0.2)
-                                                elif next_button[0] != -1:
-                                                        click_image("images/Button_next.jpg", next_button, "left", 0.2)
-                                                elif level_up_screen[0] != -1:
-                                                        click_image("images/level_up.jpg", level_up_screen, "left", 0.2)
-                                                # Se detecta la pantalla de diálogo después del duelo y clickea hasta que el personaje
-                                                # deja de hablar
-                                                elif dialogo[0] != -1:
-                                                        while dialogo != [-1,-1]:
-                                                                if self.detener.is_set(): # Si se presiona el botón stop la busqueda se detiene
-                                                                        return
-                                                                click_image("images/character_text.jpg", dialogo, "left", 0.2)
-                                                                sleep(1)
-                                                                dialogo = imagesearch("images/character_text.jpg")
-                                                elif imagesearch("images/Gate_on.jpg")[0] != -1 or imagesearch("images/Gate_off.jpg")[0] != -1:
-                                                        break       
+                                        self.salir_de_duelo()     
                         self.change_screen()
                         if all((npc_gate, npc_pvp, npc_shop, npc_studio)):
                                 print("Se ha completado la busqueda de todos los npc en este mundo")
@@ -391,7 +384,6 @@ class DetectarPantalla(threading.Thread):
                                         npc_gate = True
                         
 
-
         def coord_for_multiple(self, images_tuple):
                 for cordx, cordy in list(map(imagesearch, images_tuple)):
                         coord = None
@@ -403,64 +395,93 @@ class DetectarPantalla(threading.Thread):
                 return [-1,-1]
 
 
-
         def farm_gate(self):
                 while True:
+                        if self.detener.is_set():
+                                return
                         if not self.gate:
                                 self.change_screen(to_gate=True)
-                        elif self.gate:
+                        if self.gate:
                                 coord_gate = imagesearch("images/gate_piece.jpg")
                                 while coord_gate[0] == -1:
+                                        if self.detener.is_set():
+                                                return
+                                        self.change_screen(to_gate=True)
                                         coord_gate = imagesearch("images/gate_piece.jpg")
                                 click_image("images/gate_piece.jpg", coord_gate, "left", 0.2)
-                                while imagesearch("images/yami_yugi_text.jpg")[0] == -1:
-                                        continue
-                                if imagesearch("images/lvl_10_check.jpg"):
-                                        coor_duel_button = imagesearch("images/duel_button.jpg")
-                                        click_image("images/duel_button.jpg", coor_duel_button, "left", 0.2)
-                                        sleep(2)
+                                if self.lista_duelistas[0][0].state() == ('selected',):
+                                        self.duelear_en_puerta(self.lista_duelistas[0][0]['text'],
+                                                               self.lista_duelistas[0][1].get(),
+                                                               self.lista_duelistas[0][2].get())
+                                # while imagesearch("images/yami_yugi_text.jpg")[0] == -1:
+                                #         continue
+                                # if imagesearch("images/lvl_10_check.jpg"):
+                                #         coor_duel_button = imagesearch("images/duel_button.jpg")
+                                #         click_image("images/duel_button.jpg", coor_duel_button, "left", 0.2)
+                                #         sleep(2)
+                                #         dialogo = imagesearch("images/character_text.jpg")
+                                #         while dialogo != [-1,-1]:
+                                #                 if self.detener.is_set(): # Si se presiona el botón stop la busqueda se detiene
+                                #                         return
+                                #                 click_image("images/character_text.jpg", dialogo, "left", 0.2)
+                                #                 sleep(1)
+                                #                 dialogo = imagesearch("images/character_text.jpg")
+                                #                 if imagesearch("images/duel_button.jpg")[0] != -1:
+                                #                         break
+                                #         coor_duel_button = imagesearch("images/duel_button.jpg")
+                                #         click_image("images/duel_button.jpg", coor_duel_button, "left", 0.2)
+
+
+        def duelear_en_puerta(self, duelista, cantidad, nivel):
+                duelistas = {
+                        'Yami Yugi': 'images/yami_yugi_text.jpg'
+                        }
+                niveles = {
+                        'lvl 10': 'images/lvl_10_check.jpg'
+                        }
+                if duelista == 'Yami Yugi':
+                        print(duelistas[duelista])
+                        print(type(cantidad))
+                
+
+        def salir_de_duelo(self):
+                while True:
+                        ok_button = imagesearch("images/pop_up_ok.jpg") 
+                        next_button = imagesearch("images/Button_next.jpg")
+                        level_up_screen = imagesearch("images/level_up.jpg")
+                        dialogo = imagesearch("images/character_text.jpg")
+                        if self.detener.is_set(): # Si se presiona el botón stop la busqueda se detiene
+                                return
+                        if ok_button[0] != -1:
+                                click_image("images/pop_up_ok.jpg", ok_button, "left", 0.2)
+                                sleep(2)
+                        elif next_button[0] != -1:
+                                click_image("images/Button_next.jpg", next_button, "left", 0.2)
+                                sleep(2)
+                        elif level_up_screen[0] != -1:
+                                click_image("images/level_up.jpg", level_up_screen, "left", 0.2)
+                                sleep(2)
+                        # Se detecta la pantalla de diálogo después del duelo y clickea hasta que el personaje
+                        # deja de hablar
+                        elif dialogo[0] != -1:
+                                while dialogo != [-1,-1]:
+                                        if self.detener.is_set(): # Si se presiona el botón stop la busqueda se detiene
+                                                return
+                                        click_image("images/character_text.jpg", dialogo, "left", 0.2)
+                                        sleep(1)
                                         dialogo = imagesearch("images/character_text.jpg")
-                                        while dialogo != [-1,-1]:
-                                                if self.detener.is_set(): # Si se presiona el botón stop la busqueda se detiene
-                                                        return
-                                                click_image("images/character_text.jpg", dialogo, "left", 0.2)
-                                                sleep(1)
-                                                dialogo = imagesearch("images/character_text.jpg")
-                                                if imagesearch("images/duel_button.jpg")[0] != -1:
-                                                        break
-                                        coor_duel_button = imagesearch("images/duel_button.jpg")
-                                        click_image("images/duel_button.jpg", coor_duel_button, "left", 0.2)
-                                        while True:
-                                                ok_button = imagesearch("images/pop_up_ok.jpg") 
-                                                next_button = imagesearch("images/Button_next.jpg")
-                                                level_up_screen = imagesearch("images/level_up.jpg")
-                                                dialogo = imagesearch("images/character_text.jpg")
-                                                print(next_button)
-                                                if self.detener.is_set(): # Si se presiona el botón stop la busqueda se detiene
-                                                        return
-                                                if ok_button[0] != -1:
-                                                        click_image("images/pop_up_ok.jpg", ok_button, "left", 0.2)
-                                                        sleep(2)
-                                                elif next_button[0] != -1:
-                                                        click_image("images/Button_next.jpg", next_button, "left", 0.2)
-                                                        sleep(2)
-                                                elif level_up_screen[0] != -1:
-                                                        click_image("images/level_up.jpg", level_up_screen, "left", 0.2)
-                                                        sleep(2)
-                                                # Se detecta la pantalla de diálogo después del duelo y clickea hasta que el personaje
-                                                # deja de hablar
-                                                elif dialogo[0] != -1:
-                                                        while dialogo != [-1,-1]:
-                                                                if self.detener.is_set(): # Si se presiona el botón stop la busqueda se detiene
-                                                                        return
-                                                                click_image("images/character_text.jpg", dialogo, "left", 0.2)
-                                                                sleep(1)
-                                                                dialogo = imagesearch("images/character_text.jpg")
-                                                elif imagesearch("images/Gate.jpg")[0] != -1:
-                                                        break
+                        elif imagesearch("images/Gate.jpg")[0] != -1:
+                                return
 
 
-
+        def imprimir_texto(self, texto):
+                
+                self.texto.config(state='normal')
+                self.texto.insert(str(self.contador_de_lineas), texto + "\n")
+                self.texto.config(state='disabled')
+                self.contador_de_lineas += 1.0
+                    
+                                                       
         def stop(self):
                 self.detener.set()
 
