@@ -437,11 +437,31 @@ class DetectarPantalla(threading.Thread):
                         'Yami Yugi': 'images/yami_yugi_text.jpg'
                         }
                 niveles = {
-                        'lvl 10': 'images/lvl_10_check.jpg'
+                        'lvl 10' : 'images/lvl_10_check.jpg',
+                        'lvl 20' : 'images/lvl_20_check.jpg',
+                        'lvl 30' : 'images/lvl_30_check.jpg' 
                         }
                 if duelista == 'Yami Yugi':
-                        print(duelistas[duelista])
-                        print(type(cantidad))
+                        self.buscar_en_puerta(duelistas[duelista], niveles[nivel])
+                    
+                        
+        def buscar_en_puerta(self, duelista, nivel):
+                flecha_cambiar = imagesearch('images/flecha_cambiar_duelista.jpg')
+                while flecha_cambiar[0] == -1:
+                        if self.detener.is_set():
+                                return
+                        flecha_cambiar = imagesearch('images/flecha_cambiar_duelista.jpg')
+                nombre_duelista = imagesearch(duelista)
+                while nombre_duelista[0] == -1:
+                        if self.detener.is_set():
+                                return
+                        click_image('images/flecha_cambiar_duelista.jpg', flecha_cambiar, 'left', 0.2)
+                        nombre_duelista = imagesearch(duelista)
+                        print(nombre_duelista)
+                        sleep(2)
+                nivel_duelista = imagesearch(nivel)
+                if nivel_duelista[0] != -1:
+                        click_image(nivel, nivel_duelista, 'left', 0.2)
                 
 
         def salir_de_duelo(self):
