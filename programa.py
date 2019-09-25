@@ -1,9 +1,8 @@
 import threading
-from tkinter import ttk
 import numpy as np
 from time import sleep
-
-
+from tkinter import ttk
+from tkinter import messagebox
 
 from imagesearch import click_image, imagesearch, imagesearch_numLoop, imagesearch_loop
 
@@ -401,50 +400,74 @@ class DetectarPantalla(threading.Thread):
                                 return
                         if not self.gate:
                                 self.change_screen(to_gate=True)
-                        if self.gate:
+                        self.clickear_puerta()
+                        for x, y in enumerate(self.lista_duelistas):
+                                if self.detener.is_set():
+                                        return
+                                self.verificar_duelista(x)
+                                
+                 
+
+
+        def verificar_duelista(self, nro_duelista):
+                if self.lista_duelistas[nro_duelista][0].state() == ('selected',):
+                        cantidad = self.lista_duelistas[nro_duelista][1].get()
+                        if not cantidad.isdigit():
+                                messagebox.showerror("caracter inválido", "Solo debe introducir números en la" 
+                                                     + "casilla 'n° duels' de la pestaña 'duelistas'")
+                                self.stop()
+                                return
+                        cantidad = int(cantidad)
+                        while cantidad > 0:
+                                if self.detener.is_set():
+                                        return
+                                if imagesearch('images/Gate_on.jpg')[0] != -1:
+                                        self.clickear_puerta()
+                                self.duelear_en_puerta(self.lista_duelistas[nro_duelista][0]['text'],
+                                                        self.lista_duelistas[nro_duelista][2].get())
+                else:
+                        return 0
+
+
+        def clickear_puerta(self):
+                if self.gate:
+                        coord_gate = imagesearch("images/gate_piece.jpg")
+                        while coord_gate[0] == -1:
+                                if self.detener.is_set():
+                                        return
+                                self.change_screen(to_gate=True)
                                 coord_gate = imagesearch("images/gate_piece.jpg")
-                                while coord_gate[0] == -1:
-                                        if self.detener.is_set():
-                                                return
-                                        self.change_screen(to_gate=True)
-                                        coord_gate = imagesearch("images/gate_piece.jpg")
+                        click_image("images/gate_piece.jpg", coord_gate, "left", 0.2)
+                        go_back_button = imagesearch('images/go_back_button.jpg')
+                        while go_back_button[0] == -1:
                                 click_image("images/gate_piece.jpg", coord_gate, "left", 0.2)
-                                if self.lista_duelistas[0][0].state() == ('selected',):
-                                        self.duelear_en_puerta(self.lista_duelistas[0][0]['text'],
-                                                               self.lista_duelistas[0][1].get(),
-                                                               self.lista_duelistas[0][2].get())
-                                # while imagesearch("images/yami_yugi_text.jpg")[0] == -1:
-                                #         continue
-                                # if imagesearch("images/lvl_10_check.jpg"):
-                                #         coor_duel_button = imagesearch("images/duel_button.jpg")
-                                #         click_image("images/duel_button.jpg", coor_duel_button, "left", 0.2)
-                                #         sleep(2)
-                                #         dialogo = imagesearch("images/character_text.jpg")
-                                #         while dialogo != [-1,-1]:
-                                #                 if self.detener.is_set(): # Si se presiona el botón stop la busqueda se detiene
-                                #                         return
-                                #                 click_image("images/character_text.jpg", dialogo, "left", 0.2)
-                                #                 sleep(1)
-                                #                 dialogo = imagesearch("images/character_text.jpg")
-                                #                 if imagesearch("images/duel_button.jpg")[0] != -1:
-                                #                         break
-                                #         coor_duel_button = imagesearch("images/duel_button.jpg")
-                                #         click_image("images/duel_button.jpg", coor_duel_button, "left", 0.2)
-
-
-        def duelear_en_puerta(self, duelista, cantidad, nivel):
+                                sleep(2)
+                                go_back_button = imagesearch('images/go_back_button.jpg')
+                        
+                        
+        def duelear_en_puerta(self, duelista, nivel):
                 duelistas = {
-                        'Yami Yugi': 'images/yami_yugi_text.jpg'
+                        'Yami Yugi': 'images/yami_yugi_text.jpg',
+                        'Seto Kaiba': 'images/seto_kaiba_text.jpg'
                         }
                 niveles = {
                         'lvl 10' : 'images/lvl_10_check.jpg',
                         'lvl 20' : 'images/lvl_20_check.jpg',
-                        'lvl 30' : 'images/lvl_30_check.jpg' 
+                        'lvl 30' : 'images/lvl_30_check.jpg',
+                        'lvl 40' : 'images/lvl_40_check.jpg'
                         }
                 if duelista == 'Yami Yugi':
-                        self.buscar_en_puerta(duelistas[duelista], niveles[nivel])
+                                self.buscar_en_puerta(duelistas[duelista], niveles[nivel])
+                                self.salir_de_duelo()
+               
                     
                         
+        '''
+        Busca al duelista una vez clickeada la puerta, clickea en su nivel y comienza el duelo
+        
+        duelista: nombre del duelista a buscar
+        nivel: nivel del duelista pasado como string "lvl x"
+        '''                
         def buscar_en_puerta(self, duelista, nivel):
                 flecha_cambiar = imagesearch('images/flecha_cambiar_duelista.jpg')
                 while flecha_cambiar[0] == -1:
@@ -456,22 +479,40 @@ class DetectarPantalla(threading.Thread):
                         if self.detener.is_set():
                                 return
                         click_image('images/flecha_cambiar_duelista.jpg', flecha_cambiar, 'left', 0.2)
-                        nombre_duelista = imagesearch(duelista)
-                        print(nombre_duelista)
                         sleep(2)
+                        nombre_duelista = imagesearch(duelista)
                 nivel_duelista = imagesearch(nivel)
                 if nivel_duelista[0] != -1:
                         click_image(nivel, nivel_duelista, 'left', 0.2)
-                
+                        coor_duel_button = imagesearch("images/duel_button.jpg")
+                        click_image("images/duel_button.jpg", coor_duel_button, "left", 0.2)
+                        sleep(2)
+                        dialogo = imagesearch("images/character_text.jpg")
+                        while dialogo != [-1,-1]:
+                                if self.detener.is_set(): # Si se presiona el botón stop la busqueda se detiene
+                                        return
+                                click_image("images/character_text.jpg", dialogo, "left", 0.2)
+                                sleep(1)
+                                dialogo = imagesearch("images/character_text.jpg")
+                                if imagesearch("images/duel_button.jpg")[0] != -1:
+                                        break
+                        coor_duel_button = imagesearch("images/duel_button.jpg")
+                        click_image("images/duel_button.jpg", coor_duel_button, "left", 0.2)
 
+
+        '''
+        Una vez iniciado el duelo busca de forma constante los botones ok y next hasta
+        salir a la pantalla principal donde una vez que la detecta sale de la función
+        
+        '''        
         def salir_de_duelo(self):
                 while True:
+                        if self.detener.is_set(): # Si se presiona el botón stop la busqueda se detiene
+                                return
                         ok_button = imagesearch("images/pop_up_ok.jpg") 
                         next_button = imagesearch("images/Button_next.jpg")
                         level_up_screen = imagesearch("images/level_up.jpg")
                         dialogo = imagesearch("images/character_text.jpg")
-                        if self.detener.is_set(): # Si se presiona el botón stop la busqueda se detiene
-                                return
                         if ok_button[0] != -1:
                                 click_image("images/pop_up_ok.jpg", ok_button, "left", 0.2)
                                 sleep(2)

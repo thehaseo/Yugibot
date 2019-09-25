@@ -107,8 +107,8 @@ class PestanaDuelistas(tk.Frame):
             niveldl = ttk.Combobox(mitad, takefocus=0, state='readonly',
                                    justify='right', width=8)
             niveldl['values'] = ('lvl 10', 'lvl 20', 'lvl 30', 'lvl 40')
-            texto_cantidad = StringVar()
-            cantidad = tk.Entry(mitad, takefocus=0, textvariable=texto_cantidad, width=5)
+            texto_cantidad = StringVar(mitad, value='n° duels')
+            cantidad = tk.Entry(mitad, takefocus=0, textvariable=texto_cantidad, width=8)
             
             duelista.grid(row=rw, column=clmn, padx=2, pady=3, sticky='w')
             cantidad.grid(row=rw, column=clmn+1, padx=3, pady=3)
@@ -175,7 +175,7 @@ class PestanaDuelistas(tk.Frame):
 if __name__ == "__main__":
     raiz = tk.Tk()
     raiz.title("Yu-Gi-Oh duel links bot")
-    raiz.geometry('500x600')
+    raiz.geometry('600x600')
     raiz.resizable(width=False, height=False)
     raiz.update_idletasks()
     Gui(raiz, height=raiz.winfo_height(), width=raiz.winfo_width()).grid(row=0, column=0)
