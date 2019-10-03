@@ -4,7 +4,7 @@ from time import sleep
 from tkinter import ttk
 from tkinter import messagebox
 
-from imagesearch import click_image, imagesearch, imagesearch_numLoop, imagesearch_loop
+from imagesearch import click_image, imagesearch, imagesearch_color
 
 
 
@@ -27,6 +27,7 @@ class DetectarPantalla(threading.Thread):
                 self.duel_studio = False
                 self.world_checked = False
                 self.dm_world = False
+                self.DSOD_world = False
                 self.gx_world = False
                 self._5ds_world = False
                 self.npc_searched = False
@@ -42,7 +43,7 @@ class DetectarPantalla(threading.Thread):
                     "images/Suspended_duel.jpg", "images/duel_studio_on.jpg",
                     "images/avanzar_escena.jpg", "images/pvp_arena_on.jpg",
                     "images/shop_on.jpg", "images/character_text.jpg", 
-                    "images/level_up.jpg"
+                    "images/level_up.jpg", "images/close_button2.jpg",
                     ]
                 self.npcdm_list = ["npc/andrew1.jpg", "npc/andrew2.jpg", "npc/andrew3.jpg",
                     "npc/andrew4.jpg", 
@@ -86,7 +87,7 @@ class DetectarPantalla(threading.Thread):
                                 if self.pos[0] == -1:
                                         print(imagen+" not found, waiting")
                                         sleep(0.1)
-                                else:   #Si encuentra un personaje hablando clickea hasta que 
+                                else:   # Si encuentra un personaje hablando clickea hasta que 
                                         # se calle
                                         print(self.pos[0])
                                         while index == 11:
@@ -100,7 +101,7 @@ class DetectarPantalla(threading.Thread):
                                         # Al encontrar una imagen de la lista de 
                                         # que no sean algunas de las 4 pantallas principales
                                         # clickea sobre ellas
-                                        if index in {0,1,2,3,5,6,8,12}:
+                                        if index in {0,1,2,3,5,6,8,12,13}:
                                                 click_image(imagen, self.pos, "left", 0.2)
                                         elif index in {7,9,10}:
                                                 self.change_screen(to_gate=True)
@@ -145,11 +146,14 @@ class DetectarPantalla(threading.Thread):
                 # (cambiando la variable a True) dependiendo de cuales mundos aparezcan 
                 # en las imágenes una vez presionado el botón
                 coord = None
-                contador = 0
+                contador = 0 # Usado para recorrer cada imagen
                 world_check_button = list(map(imagesearch, ("images/check_world_button.jpg", 
                                 "images/check_world_button2.jpg", "images/check_world_button3.jpg",
                                 "images/check_world_button4.jpg", "images/check_world_button5.jpg",
-                                "images/check_world_button6.jpg", "images/check_world_button7.jpg")))
+                                "images/check_world_button6.jpg", "images/check_world_button7.jpg",
+                                "images/check_world_button8.jpg", "images/check_world_button9.jpg",
+                                "images/check_world_button10.jpg", "images/check_world_button11.jpg",
+                                "images/check_world_button12.jpg")))
                 
                 for cordx, cordy in world_check_button:  
                         if not -1 in {cordx,cordy}:
@@ -167,46 +171,50 @@ class DetectarPantalla(threading.Thread):
                                 return
                         contador += 1
                 click_image("images/check_world_button.jpg", coord, "left", 0.1)
-                if imagesearch("images/gx_world_check.jpg")[0] != -1 and imagesearch("images/5ds_world_check.jpg")[0] != -1:    
+                if imagesearch("images/DSOD_world_check.jpg")[0] != -1:
+                        self.imprimir_texto("DSOD world desbloqueado")
+                if imagesearch("images/gx_world_check.jpg")[0] != -1:
+                        self.imprimir_texto("Gx world desbloqueado")
+                if imagesearch("images/5ds_world_check.jpg")[0] != -1:
+                        self.imprimir_texto("5ds world desbloqueado")
+                if imagesearch_color("images/dm_world_selected.jpg", precision=0.9)[0] != -1:
                         self.gx_world = False
                         self._5ds_world = False
                         self.dm_world = True
+                        self.DSOD_world = False
                         self.world_checked = True
-                        self.imprimir_texto("Gx world unlocked")
-                        self.imprimir_texto("5ds world unlocked")
                         self.imprimir_texto("Se encuentra en dm world")
-                elif imagesearch("images/dm_world_check.jpg")[0] != -1 and imagesearch("images/5ds_world_check.jpg")[0] != -1:
+                        return
+                if imagesearch("images/dm_world_check.jpg")[0] == -1:
+                        click_image("images/check_world_button.jpg", coord, "left", 0.1)
+                if imagesearch_color("images/DSOD_world_selected.jpg", precision=0.9)[0] != -1:
+                        self.gx_world = False
+                        self._5ds_world = False
+                        self.dm_world = False
+                        self.DSOD_world = True
+                        self.world_checked = True
+                        self.imprimir_texto("Se encuentra en DOSD world")
+                        return
+                if imagesearch("images/dm_world_check.jpg")[0] == -1:
+                        click_image("images/check_world_button.jpg", coord, "left", 0.1)
+                if imagesearch_color("images/gx_world_selected.jpg", precision=0.9)[0] != -1:
                         self.gx_world = True
                         self._5ds_world = False
                         self.dm_world = False
+                        self.DSOD_world = False
                         self.world_checked = True
-                        self.imprimir_texto("Gx world unlocked")
-                        self.imprimir_texto("5ds world unlocked")
-                        self.imprimir_texto("Se encuentra en gx world")
-                elif imagesearch("images/dm_world_check.jpg")[0] != -1 and imagesearch("images/gx_world_check.jpg")[0] != -1:
+                        self.imprimir_texto("Se encuentra en Gx world")
+                        return
+                if imagesearch("images/dm_world_check.jpg")[0] == -1:
+                        click_image("images/check_world_button.jpg", coord, "left", 0.1)
+                if imagesearch_color("images/5ds_world_selected.jpg", precision=0.9)[0] != -1:
                         self.gx_world = False
                         self._5ds_world = True
                         self.dm_world = False
+                        self.DSOD_world = False
                         self.world_checked = True
-                        self.imprimir_texto("Gx world unlocked")
-                        self.imprimir_texto("5ds world unlocked")
                         self.imprimir_texto("Se encuentra en 5ds world")
-                elif imagesearch("images/dm_world_check.jpg")[0] != -1 and imagesearch("images/5ds_world_check.jpg")[0] == -1:
-                        self.gx_world = False
-                        self._5ds_world = False
-                        self.dm_world = True
-                        self.world_checked = True
-                        self.imprimir_texto("Gx world unlocked")
-                        self.imprimir_texto("5ds world not unlocked")
-                        self.imprimir_texto("Se encuentra en dm world")
-                elif imagesearch("images/dm_world_check.jpg")[0] != -1 and imagesearch("images/5ds_world_check.jpg")[0] == -1:
-                        self.gx_world = False
-                        self._5ds_world = False
-                        self.dm_world = True
-                        self.world_checked = True
-                        self.imprimir_texto("Gx world unlocked")
-                        self.imprimir_texto("5ds world not unlocked")
-                        self.imprimir_texto("Se encuentra en gx world")
+                        return
 
 
         def change_screen(self, to_gate=False):
@@ -405,6 +413,8 @@ class DetectarPantalla(threading.Thread):
                                 if self.detener.is_set():
                                         return
                                 self.verificar_duelista(x)
+                                if x == len(self.lista_duelistas) - 1:
+                                        return
                                 
                  
 
@@ -425,8 +435,12 @@ class DetectarPantalla(threading.Thread):
                                         self.clickear_puerta()
                                 self.duelear_en_puerta(self.lista_duelistas[nro_duelista][0]['text'],
                                                         self.lista_duelistas[nro_duelista][2].get())
-                else:
-                        return 0
+                                cantidad -= 1
+                                print(cantidad)
+                                self.lista_duelistas[nro_duelista][1].delete(0, "end")
+                                self.lista_duelistas[nro_duelista][1].insert(0, cantidad)
+                        if cantidad == 0:
+                                return
 
 
         def clickear_puerta(self):
@@ -440,6 +454,8 @@ class DetectarPantalla(threading.Thread):
                         click_image("images/gate_piece.jpg", coord_gate, "left", 0.2)
                         go_back_button = imagesearch('images/go_back_button.jpg')
                         while go_back_button[0] == -1:
+                                if self.detener.is_set():
+                                        return
                                 click_image("images/gate_piece.jpg", coord_gate, "left", 0.2)
                                 sleep(2)
                                 go_back_button = imagesearch('images/go_back_button.jpg')

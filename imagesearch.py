@@ -97,8 +97,8 @@ the top left corner coordinates of the element if found as an array [x,y] or [-1
 def imagesearch(image, precision=0.8, save=None):
     im = pyautogui.screenshot()
     
-    img_rgb = np.array(im)
-    img_gray = cv2.cvtColor(img_rgb, cv2.COLOR_BGR2GRAY)
+    img_bgr = np.array(im)
+    img_gray = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2GRAY)
     template = cv2.imread(image, 0)
     template.shape[::-1]
 
@@ -128,9 +128,9 @@ the top left corner coordinates of the element if found as an array [x,y] or [-1
 def imagesearch_color(image, precision=0.8, save=None):
     im = pyautogui.screenshot()
     
-    img_rgb = np.array(im)
+    img_bgr = np.array(im)
+    img_rgb = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB) # opencv process the images in bgr channels
     template = cv2.imread(image, 1)
-    template.shape[::-1]
 
     if save:
         im.save('testarea.png') #usefull for debugging purposes, this will save the captured region as "testarea.png"
