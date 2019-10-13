@@ -3,6 +3,7 @@ import numpy as np
 from time import sleep
 from tkinter import ttk
 from tkinter import messagebox
+from pyautogui import moveTo, drag
 
 from imagesearch import click_image, imagesearch, imagesearch_color
 
@@ -153,7 +154,7 @@ class DetectarPantalla(threading.Thread):
                                 "images/check_world_button6.jpg", "images/check_world_button7.jpg",
                                 "images/check_world_button8.jpg", "images/check_world_button9.jpg",
                                 "images/check_world_button10.jpg", "images/check_world_button11.jpg",
-                                "images/check_world_button12.jpg")))
+                                "images/check_world_button12.jpg", "images/check_world_button13.jpg")))
                 
                 for cordx, cordy in world_check_button:  
                         if not -1 in {cordx,cordy}:
@@ -415,8 +416,6 @@ class DetectarPantalla(threading.Thread):
                                 self.verificar_duelista(x)
                                 if x == len(self.lista_duelistas) - 1:
                                         return
-                                
-                 
 
 
         def verificar_duelista(self, nro_duelista):
@@ -431,12 +430,13 @@ class DetectarPantalla(threading.Thread):
                         while cantidad > 0:
                                 if self.detener.is_set():
                                         return
+                                print(self.lista_duelistas[nro_duelista][0]['text'])
+                                print(cantidad)
                                 if imagesearch('images/Gate_on.jpg')[0] != -1:
                                         self.clickear_puerta()
                                 self.duelear_en_puerta(self.lista_duelistas[nro_duelista][0]['text'],
                                                         self.lista_duelistas[nro_duelista][2].get())
                                 cantidad -= 1
-                                print(cantidad)
                                 self.lista_duelistas[nro_duelista][1].delete(0, "end")
                                 self.lista_duelistas[nro_duelista][1].insert(0, cantidad)
                         if cantidad == 0:
@@ -463,18 +463,74 @@ class DetectarPantalla(threading.Thread):
                         
         def duelear_en_puerta(self, duelista, nivel):
                 duelistas = {
-                        'Yami Yugi': 'images/yami_yugi_text.jpg',
-                        'Seto Kaiba': 'images/seto_kaiba_text.jpg'
+                        "Yami Yugi": "images/yami_yugi_text.jpg",
+                        "Seto Kaiba": "images/seto_kaiba_text.jpg",
+                        "Joey Wheeler": "images/joey_text.jpg",
+                        "Mai Valentine": "images/mai_valentine_text.jpg",
+                        "Tea Gardner": "images/tea_text.jpg",
+                        "Weevil Underwood": "images/weevil_text.jpg",
+                        "Rex Raptor": "images/rex_raptor_text.jpg",
+                        "Mako Tsunami": "images/mako_text.jpg",
+                        "Bandit Keith": "images/bandit_keith_text.jpg",
+                        "Odion": "images/odion.jpg",
+                        "Ishizu Ishtar": "queda pendiente",
+                        "Yugi Muto": "images/yugi_muto_text.jpg",
+                        "Yami Marik": "images/yami_marik_text.jpg",
+                        "Yami Bakura": "images/yami_bakura_text.jpg",
+                        "Pegasus": "images/pegasus_text.jpg",
+                        "Mokuba Kaiba": "images/mokuba_text.jpg",
+                        "Paradox Brothers": "images/paradox_text.jpg",
+                        "Arkana": "images/arkana.jpg",
+                        "Bonz": "images/bonz_text.jpg",
+                        "Espa Roba": "images/espa_roba_text.jpg",
+                        "Tristan Taylor": "images/tristan_text.jpg"
                         }
+                duelistas_dsod = {
+                        "Seto Kaiba DSOD": "images/seto_kaiba_text.jpg",
+                        "Mokuba Kaiba DSOD": "images/mokuba_text.jpg"
+                }
+                duelistas_gx = {
+                        "Jaden Yuki": "images/jaden_text.jpg",
+                        "Chazz": "images/chazz_text.jpg",
+                        "Alexis Rhodes": "images/alexis_text.jpg",
+                        "Aster Phoenix": "pendiente",
+                        "Zane Truesdale": "images/zane_text.jpg",
+                        "Bastion Misawa": "pendiente",
+                        "Jesse Anderson": "images/jesse_text.jpg",
+                        "Vellian Crowler": "images/crowler_text.jpg",
+                        "Syrus Truesdale": "images/syrus_text.jpg",
+                        "Tyranno Hassleberry": "images/tyranno_text.jpg",
+                        "Sartorius Kumar": "images/sartorius_text.jpg"
+                }
+                duelistas_5ds = {
+                        "Yusei Fudo": "images/yusei_text.jpg",
+                        "Jack": "images/jack_text.jpg",
+                        "Crow Hogan": "images/crow_text.jpg",
+                        "Akiza Izinski": "images/akiza_text.jpg",
+                        "Leo": "pendiente",
+                        "Luna": "pendiente",
+                        "Tetsu Trudge": "images/tetsu_text.jpg"
+                }
                 niveles = {
                         'lvl 10' : 'images/lvl_10_check.jpg',
                         'lvl 20' : 'images/lvl_20_check.jpg',
                         'lvl 30' : 'images/lvl_30_check.jpg',
                         'lvl 40' : 'images/lvl_40_check.jpg'
                         }
-                if duelista == 'Yami Yugi':
-                                self.buscar_en_puerta(duelistas[duelista], niveles[nivel])
-                                self.salir_de_duelo()
+                if duelista in duelistas:
+                        self.buscar_en_puerta(duelistas[duelista], niveles[nivel], "dm")
+                        self.salir_de_duelo()
+                elif duelista in duelistas_dsod:
+                        self.buscar_en_puerta(duelistas_dsod[duelista], niveles[nivel], "dsod")
+                        self.salir_de_duelo()
+                elif duelista in duelistas_gx:
+                        self.buscar_en_puerta(duelistas_gx[duelista], niveles[nivel], "gx")
+                        self.salir_de_duelo()
+                elif duelista in duelistas_5ds:
+                        self.buscar_en_puerta(duelistas_5ds[duelista], niveles[nivel], "5ds")
+                        self.salir_de_duelo()
+                
+
                
                     
                         
@@ -483,14 +539,24 @@ class DetectarPantalla(threading.Thread):
         
         duelista: nombre del duelista a buscar
         nivel: nivel del duelista pasado como string "lvl x"
+        mundo: parametro para saber en que mundo se va a buscar el duelista, si mundo=None
+        entonces se buscará en dm por defecto
         '''                
-        def buscar_en_puerta(self, duelista, nivel):
+        def buscar_en_puerta(self, duelista, nivel, mundo=None):
+                if mundo == "dm":
+                        self.cambiar_puerta_a_mundo("dm")
+                elif mundo == "dsod":
+                        self.cambiar_puerta_a_mundo("dsod")
+                elif mundo == "gx":
+                        self.cambiar_puerta_a_mundo("gx")
+                elif mundo == "5ds":
+                        self.cambiar_puerta_a_mundo("5ds")
                 flecha_cambiar = imagesearch('images/flecha_cambiar_duelista.jpg')
                 while flecha_cambiar[0] == -1:
                         if self.detener.is_set():
                                 return
                         flecha_cambiar = imagesearch('images/flecha_cambiar_duelista.jpg')
-                nombre_duelista = imagesearch(duelista)
+                nombre_duelista = imagesearch(duelista, precision=0.9)
                 while nombre_duelista[0] == -1:
                         if self.detener.is_set():
                                 return
@@ -504,7 +570,7 @@ class DetectarPantalla(threading.Thread):
                         click_image("images/duel_button.jpg", coor_duel_button, "left", 0.2)
                         sleep(2)
                         dialogo = imagesearch("images/character_text.jpg")
-                        while dialogo != [-1,-1]:
+                        while dialogo[0] != [-1]:
                                 if self.detener.is_set(): # Si se presiona el botón stop la busqueda se detiene
                                         return
                                 click_image("images/character_text.jpg", dialogo, "left", 0.2)
@@ -515,7 +581,55 @@ class DetectarPantalla(threading.Thread):
                         coor_duel_button = imagesearch("images/duel_button.jpg")
                         click_image("images/duel_button.jpg", coor_duel_button, "left", 0.2)
 
-
+ 
+        def cambiar_puerta_a_mundo(self, mundo):
+                switch_gate_button_coord = imagesearch("images/switch_gate_button.jpg")
+                while switch_gate_button_coord[0] == -1:
+                        if self.detener.is_set():
+                                return
+                        switch_gate_button_coord = imagesearch('images/switch_gate_button.jpg.jpg')
+                click_image("images/switch_gate_button.jpg", switch_gate_button_coord, "left", 0.2)
+                if mundo == "dm":
+                        dm_icon = imagesearch('images/dsod_world_icon.jpg')
+                        while dm_icon[0] == -1:
+                                if self.detener.is_set():
+                                        return
+                                dm_icon = imagesearch('images/dm_world_icon.jpg')
+                                if dm_icon[0] != -1:
+                                        break
+                                dsod_icon = imagesearch('images/dsod_world_icon.jpg')
+                                moveTo(dsod_icon)
+                                drag(0, 50, 0.5, button="left") # arrastra para mostrar por completo el icono del mundo
+                        click_image("images/dsod_world_icon.jpg", dm_icon, "left", 0.2)
+                elif mundo == "dsod":
+                        dsod_icon = imagesearch('images/dsod_world_icon.jpg')
+                        while dsod_icon[0] == -1:
+                                if self.detener.is_set():
+                                        return
+                                dsod_icon = imagesearch('images/dsod_world_icon.jpg')
+                        click_image("images/dsod_world_icon.jpg", dsod_icon, "left", 0.2)
+                elif mundo == "gx":
+                        gx_icon = imagesearch('images/gx_world_icon.jpg')
+                        while gx_icon[0] == -1:
+                                if self.detener.is_set():
+                                        return
+                                gx_icon = imagesearch('images/gx_world_icon.jpg')
+                        click_image("images/gx_world_icon.jpg", gx_icon, "left", 0.2)
+                elif mundo == "5ds":
+                        _5ds_icon = imagesearch('images/5ds_world_icon.jpg')
+                        while _5ds_icon[0] == -1:
+                                if self.detener.is_set():
+                                        return
+                                _5ds_icon = imagesearch('images/5ds_world_icon.jpg')
+                                if _5ds_icon[0] != -1:
+                                        break
+                                gx_icon = imagesearch('images/gx_world_icon.jpg')
+                                moveTo(gx_icon)
+                                drag(0, -50, 0.5, button="left") # arrastra para mostrar por completo el icono del mundo
+                        click_image("images/5ds_world_icon.jpg", _5ds_icon, "left", 0.2)
+                        
+                
+                
         '''
         Una vez iniciado el duelo busca de forma constante los botones ok y next hasta
         salir a la pantalla principal donde una vez que la detecta sale de la función

@@ -129,33 +129,36 @@ class PestanaDuelistas(tk.Frame):
         self.keith = crear_duelista(self, 'Bandit Keith', 9, 0, self.mitad1)
         self.odion = crear_duelista(self, 'Odion', 9, 0, self.mitad1)
         self.ishizu = crear_duelista(self, 'Ishizu Ishtar', 10, 0, self.mitad1)
-        self.pegasus = crear_duelista(self, 'Pegasus', 11, 0, self.mitad1)
-        self.bakura = crear_duelista(self, 'Yami Bakura', 12, 0, self.mitad1)
-        self.marik = crear_duelista(self, 'Yami Marik', 13, 0, self.mitad1)
-        self.yugi = crear_duelista(self, 'Yugi Muto', 14, 0, self.mitad1)
-        self.paradox = crear_duelista(self, 'Paradox Brothers', 15, 0, self.mitad1)
-        self.mokuba = crear_duelista(self, 'Mokuba Kaiba', 16, 0, self.mitad1)
+        self.yugi = crear_duelista(self, 'Yugi Muto', 11, 0, self.mitad1)
+        self.marik = crear_duelista(self, 'Yami Marik', 12, 0, self.mitad1)
+        self.bakura = crear_duelista(self, 'Yami Bakura', 13, 0, self.mitad1)
+        self.pegasus = crear_duelista(self, 'Pegasus', 14, 0, self.mitad1)
+        self.mokuba = crear_duelista(self, 'Mokuba Kaiba', 15, 0, self.mitad1)
+        self.paradox = crear_duelista(self, 'Paradox Brothers', 16, 0, self.mitad1)
         self.arkana = crear_duelista(self, 'Arkana', 17, 0, self.mitad1)
         self.bonz = crear_duelista(self, 'Bonz', 18, 0, self.mitad1)
         self.roba = crear_duelista(self, 'Espa Roba', 19, 0, self.mitad1)
         self.tristan = crear_duelista(self, 'Tristan Taylor', 20, 0, self.mitad1)
-        self.jaden = crear_duelista(self, 'Jaden Yuki', 21, 0, self.mitad1)
-        self.chazz = crear_duelista(self, 'Chazz', 0, 0, self.mitad2)
-        self.alexis = crear_duelista(self, 'Alexis Rhodes', 1, 0, self.mitad2)
-        self.aster = crear_duelista(self, 'Aster Phoenix', 2, 0, self.mitad2)
-        self.bastion = crear_duelista(self, 'Bastion Misawa', 3, 0, self.mitad2)
-        self.crowler = crear_duelista(self, 'Vellian Crowler', 4, 0, self.mitad2)
-        self.jesse = crear_duelista(self, 'Jesse Anderson', 5, 0, self.mitad2)
-        self.syrus = crear_duelista(self, 'Syrus Truesdale', 6, 0, self.mitad2)
-        self.zane = crear_duelista(self, 'Zane Truesdale', 7, 0, self.mitad2)
-        self.tyranno = crear_duelista(self, 'Tyranno Hassleberry', 8, 0, self.mitad2)
-        self.yusei = crear_duelista(self, 'Yusei Fudo', 9, 0, self.mitad2)
-        self.jack = crear_duelista(self, 'Jack', 10, 0, self.mitad2)
-        self.crow = crear_duelista(self, 'Crow Hogan', 11, 0, self.mitad2)
-        self.akiza = crear_duelista(self, 'Akiza Izinski', 12, 0, self.mitad2)
-        self.leo = crear_duelista(self, 'Leo', 13, 0, self.mitad2)
-        self.luna = crear_duelista(self, 'Luna', 14, 0, self.mitad2)
-        self.trudge = crear_duelista(self, 'Tetsu Trudge', 15, 0, self.mitad2)
+        self.seto_kaiba_dsod = crear_duelista(self, "Seto Kaiba DSOD", 21, 0, self.mitad1)
+        self.mokuba_dsod = crear_duelista(self, "Mokuba Kaiba DSOD", 0, 0, self.mitad2)
+        self.jaden = crear_duelista(self, 'Jaden Yuki', 1, 0, self.mitad2)
+        self.chazz = crear_duelista(self, 'Chazz', 2, 0, self.mitad2)
+        self.alexis = crear_duelista(self, 'Alexis Rhodes', 3, 0, self.mitad2)
+        self.aster = crear_duelista(self, 'Aster Phoenix', 4, 0, self.mitad2)
+        self.zane = crear_duelista(self, 'Zane Truesdale', 5, 0, self.mitad2)
+        self.bastion = crear_duelista(self, 'Bastion Misawa', 6, 0, self.mitad2)
+        self.jesse = crear_duelista(self, 'Jesse Anderson', 7, 0, self.mitad2)
+        self.crowler = crear_duelista(self, 'Vellian Crowler', 8, 0, self.mitad2)
+        self.syrus = crear_duelista(self, 'Syrus Truesdale', 9, 0, self.mitad2)
+        self.tyranno = crear_duelista(self, 'Tyranno Hassleberry', 10, 0, self.mitad2)
+        self.sartorius = crear_duelista(self, "Sartorius Kumar", 11, 0, self.mitad2)
+        self.yusei = crear_duelista(self, 'Yusei Fudo', 12, 0, self.mitad2)
+        self.jack = crear_duelista(self, 'Jack', 13, 0, self.mitad2)
+        self.crow = crear_duelista(self, 'Crow Hogan', 14, 0, self.mitad2)
+        self.akiza = crear_duelista(self, 'Akiza Izinski', 15, 0, self.mitad2)
+        self.leo = crear_duelista(self, 'Leo', 16, 0, self.mitad2)
+        self.luna = crear_duelista(self, 'Luna', 17, 0, self.mitad2)
+        self.trudge = crear_duelista(self, 'Tetsu Trudge', 18, 0, self.mitad2)
         
         # creación de lista con todos los duelistas de gate para pasarle sus argumentos
         # al programa principal
@@ -164,7 +167,8 @@ class PestanaDuelistas(tk.Frame):
                                    self.keith, self.odion, self.ishizu, self.pegasus, 
                                    self.bakura, self.marik, self.yugi, self.paradox,
                                    self.mokuba, self.arkana, self.bonz, self.roba, 
-                                   self.tristan, self.jaden, self.chazz, self.alexis, 
+                                   self.tristan, self.seto_kaiba_dsod, self.mokuba_dsod,
+                                   self.jaden, self.chazz, self.alexis, 
                                    self.aster, self.bastion, self.crowler, self.jesse,
                                    self.syrus, self.zane, self.tyranno, self.yusei, 
                                    self.jack, self.crow, self.akiza, self.leo, self.luna,
